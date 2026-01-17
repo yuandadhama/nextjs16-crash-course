@@ -4,6 +4,7 @@ import { IEvent } from "@/database";
 import { getSimilarEventBySlug } from "@/lib/actions/event.action";
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -48,6 +49,20 @@ const EventDetailPage = async ({
 }: {
   params: Promise<{ slug: string }>;
 }) => {
+  return (
+    <Suspense fallback="loading event detail . . .">
+      <PageComponent params={params} />
+    </Suspense>
+  );
+};
+
+const PageComponent = async ({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}) => {
+  "use cache";
+
   const { slug } = await params;
 
   const response = await fetch(`${BASE_URL}/api/events/${slug}`);
@@ -139,7 +154,7 @@ const EventDetailPage = async ({
               <p className="text-sm">Be the first to book your spot!</p>
             )}
 
-            <BookEvent />
+            <BookEvent eventId={event._id} slug={slug} />
           </div>
         </aside>
       </div>
@@ -157,5 +172,4 @@ const EventDetailPage = async ({
     </section>
   );
 };
-
 export default EventDetailPage;

@@ -1,9 +1,10 @@
-import { Schema, model, models, Document } from "mongoose";
+import { Schema, model, models, Document, ObjectId } from "mongoose";
 
 /* ==============================
-   TypeScript Interface
+  TypeScript Interface
 ================================ */
 export interface IEvent extends Document {
+  id?: any;
   title: string;
   slug: string;
   description: string;
@@ -23,7 +24,7 @@ export interface IEvent extends Document {
 }
 
 /* ==============================
-   Schema Definition
+  Schema Definition
 ================================ */
 const EventSchema = new Schema<IEvent>(
   {
@@ -118,7 +119,7 @@ const EventSchema = new Schema<IEvent>(
       },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 /* ==============================
