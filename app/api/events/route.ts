@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     } catch (e) {
       return NextResponse.json(
         { message: "Invalid JSON data format" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -25,9 +25,12 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { message: "Image file is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
+
+    let tags = JSON.parse(formData.get("tags") as string);
+    let agenda = JSON.parse(formData.get("agenda") as string);
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -42,20 +45,25 @@ export async function POST(request: NextRequest) {
           (error, result) => {
             if (error) return reject(error);
             resolve(result);
-          }
+          },
         )
         .end(buffer);
     });
 
     event.image = (uploadResult as { secure_url: string }).secure_url;
-    const createdEvent = await Event.create(event);
+
+    const createdEvent = await Event.create({
+      ...event,
+      tags: tags,
+      agenda: agenda,
+    });
 
     return NextResponse.json(
       {
         message: "Event created successfully",
         event: createdEvent,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (e) {
     console.error("Error handling POST /api/events:", e);
@@ -64,7 +72,7 @@ export async function POST(request: NextRequest) {
         message: "Event Creation Failed",
         error: e instanceof Error ? e.message : "Unknown Error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -80,7 +88,7 @@ export async function GET() {
         message: "Events fetched successfully",
         events,
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (e) {
     return NextResponse.json(
@@ -88,7 +96,7 @@ export async function GET() {
         message: "Failed to fetch events",
         error: e instanceof Error ? e.message : "Unknown Error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
